@@ -32,6 +32,17 @@
 
 package org.cbioportal.web;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.cbioportal.service.PatientService;
 import org.cbioportal.service.SampleService;
 import org.cbioportal.service.exception.PatientNotFoundException;
@@ -81,6 +92,12 @@ public class MskEntityTranslationController {
     @Value("${patient_view.url}")
     public void setPatientViewURL(String property) { this.patientViewURL = property; }
 
+    @Value("${mpath.decryption_url:}")
+    private String mpathDecryptionUrl;
+
+    @Value("${mpath.token:}")
+    private String mpathToken;
+
     private static final String ARCHER = "mskarcher";
     private static final String RAINDANCE = "mskraindance";
     private static final String IMPACT = "mskimpact";
@@ -95,7 +112,8 @@ public class MskEntityTranslationController {
         method=RequestMethod.GET
     )
     public ModelAndView redirectIMPACT(@PathVariable String sampleID, ModelMap model) {
-        return new ModelAndView(getRedirectURL(sampleID), model);
+	String decryptedId = getDecryptedId(sampleID);
+        return new ModelAndView(getRedirectURL(decryptedId), model);
     }
 
     @RequestMapping(
@@ -104,6 +122,33 @@ public class MskEntityTranslationController {
     )
     public ModelAndView redirectCRDB(@PathVariable String sampleID, ModelMap model) {
         return new ModelAndView(getRedirectURL(sampleID), model);
+    }
+
+    private String getDecryptedId(String sampleID) {
+	//logger.debug("Requesting decrypted ID");
+	// if (!existsMpathProperties(mpathDecryptionUrl, mpathToken)) {
+        //    logger.debug("Mpath Properties do not exist");
+        //    return "";
+	//}
+	String requestUrl = constructMpathDecryptionUrl(sampleID);
+	RestTemplate restTemplate = new RestTemplate();
+        
+	LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("x-api-key", mpathToken);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
+	System.out.println("attempting a decrypt of ID" + sampleID);
+	System.out.println("requestUrl");
+	ResponseEntity<String> responseEntity = restTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, String.class);
+	String decryptedId = responseEntity.getBody();
+	System.out.println("WHEEEE IM BROKEN AROUND HERE");
+	System.out.println(decryptedId);
+	return decryptedId;
+    }
+
+    private String constructMpathDecryptionUrl(String sampleId) {
+	return mpathDecryptionUrl + sampleId;
     }
 
     private String getRedirectURL(String sampleID) {
