@@ -2,6 +2,7 @@ package org.cbioportal.persistence.mybatis;
 
 import org.cbioportal.model.CancerStudy;
 import org.cbioportal.model.CancerStudyTags;
+import org.cbioportal.model.StudyAndSampleIds;
 import org.cbioportal.model.meta.BaseMeta;
 import org.cbioportal.persistence.StudyRepository;
 import org.cbioportal.persistence.mybatis.util.PaginationCalculator;
@@ -58,5 +59,10 @@ public class StudyMyBatisRepository implements StudyRepository {
             return new ArrayList<>();
         }
         return studyMapper.getTagsForMultipleStudies(studyIds);
+    }
+    
+    @Override
+    public List<StudyAndSampleIds> getStudiesAndSampleIds(List<Integer> permittedStudies) {
+        return studyMapper.getStudiesAndSampleIds(permittedStudies);
     }
 }

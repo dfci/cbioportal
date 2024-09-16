@@ -2,6 +2,7 @@ package org.cbioportal.persistence.mybatis;
 
 import org.cbioportal.model.CancerStudy;
 import org.cbioportal.model.CancerStudyTags;
+import org.cbioportal.model.StudyAndSampleIds;
 import org.cbioportal.model.meta.BaseMeta;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface StudyMapper {
     CancerStudyTags getTags(String studyId);
 
     List<CancerStudyTags> getTagsForMultipleStudies(List<String> studyIds);
+
+    List<StudyAndSampleIds> getStudiesAndSampleIds(List<Integer> permittedStudies);
 }

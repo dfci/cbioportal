@@ -2,6 +2,8 @@ package org.cbioportal.service.impl;
 
 import org.cbioportal.model.CancerStudy;
 import org.cbioportal.model.CancerStudyTags;
+import org.cbioportal.model.StudyAndSampleIds;
+import org.cbioportal.model.StudyOverlap;
 import org.cbioportal.model.TypeOfCancer;
 import org.cbioportal.model.meta.BaseMeta;
 import org.cbioportal.persistence.StudyRepository;
@@ -17,9 +19,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,5 +138,40 @@ public class StudyServiceImpl implements StudyService {
             }
         }
         return matchingStudies;
+    }
+    
+    @Override
+    public List<StudyOverlap> getStudiesWithOverlappingSamples(List<Integer> permittedStudies) {
+        Map<String, StudyOverlap> studies = new HashMap<>();
+        List<StudyAndSampleIds> studiesAndSamples = studyRepository.getStudiesAndSampleIds(permittedStudies);
+
+        for (int i = 0; i < studiesAndSamples.size(); i++) {
+            StudyAndSampleIds first = studiesAndSamples.get(i);
+            for (int j = i + 1; j < studiesAndSamples.size(); j++) {
+                StudyAndSampleIds second = studiesAndSamples.get(j);
+                if (studiesOverlap(first, second)) {
+                    StudyOverlap firstOverlap = studies.getOrDefault(first.getStudyId(), new StudyOverlap(first.getStudyId()));
+                    StudyOverlap secondOverlap = studies.getOrDefault(second.getStudyId(), new StudyOverlap(second.getStudyId()));
+                    firstOverlap.getOverlappingStudyNames().add(second.getStudyName());
+                    firstOverlap.getOverlappingStudyIds().add(second.getStudyId());
+                    secondOverlap.getOverlappingStudyNames().add(first.getStudyName());
+                    secondOverlap.getOverlappingStudyIds().add(first.getStudyId());
+                    studies.put(first.getStudyId(), firstOverlap);
+                    studies.put(second.getStudyId(), secondOverlap);
+                }
+            }
+        }
+
+        return studies.values().stream()
+            .filter(studyOverlap -> !studyOverlap.getOverlappingStudyIds().isEmpty())
+            .collect(Collectors.toList());
+    }
+
+    private boolean studiesOverlap(StudyAndSampleIds first, StudyAndSampleIds second) {
+        return intersectionNotEmpty(first.getSampleIds(), second.getSampleIds());
+    }
+
+    private boolean intersectionNotEmpty(Set<?> first, Set<?> second) {
+        return first.stream().anyMatch(second::contains);
     }
 }
