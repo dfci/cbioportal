@@ -2,6 +2,7 @@ package org.cbioportal.service;
 
 import org.cbioportal.model.CancerStudy;
 import org.cbioportal.model.CancerStudyTags;
+import org.cbioportal.model.StudyOverlap;
 import org.cbioportal.model.meta.BaseMeta;
 import org.cbioportal.service.exception.StudyNotFoundException;
 import org.cbioportal.utils.security.AccessLevel;
@@ -25,4 +26,6 @@ public interface StudyService {
     CancerStudyTags getTags(String studyId, AccessLevel accessLevel);
     
     List<CancerStudyTags> getTagsForMultipleStudies(List<String> studyIds);
+    
+    List<StudyOverlap> getStudiesWithOverlappingSamples(List<Integer> permittedStudies);
 }

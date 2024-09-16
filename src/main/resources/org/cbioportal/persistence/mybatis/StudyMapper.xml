@@ -177,5 +177,29 @@
             </if>
         </where>
     </select>
+    
+    <resultMap id="collidingSamplesResultMap" type="org.cbioportal.model.StudyAndSampleIds">
+        <result property="studyId" column="STUDY_IDENTIFIER"/>
+        <result property="studyName" column="NAME"/>
+        <collection property="sampleIds" ofType="java.lang.String" javaType="java.util.HashSet">
+            <result property="overlappingStudyId" column="SAMPLE_ID"/>
+        </collection>
+    </resultMap>
+
+    <select id="getStudiesAndSampleIds" resultMap="collidingSamplesResultMap">
+        select
+            sample.STABLE_ID as SAMPLE_ID,
+            cancer_study.CANCER_STUDY_IDENTIFIER as STUDY_IDENTIFIER,
+            cancer_study.NAME as NAME
+        from
+            sample
+            inner join patient on sample.PATIENT_ID = patient.INTERNAL_ID
+            inner join cancer_study on cancer_study.CANCER_STUDY_ID = patient.CANCER_STUDY_ID
+        where
+            cancer_study.CANCER_STUDY_ID IN
+            <foreach item="item" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    </select>
 
 </mapper>
