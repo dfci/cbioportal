@@ -70,6 +70,8 @@ public class ImportController {
 
     @RequestMapping(value = "/api/logs/{logType}/{studyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get the specified log file")
+    @ApiResponse(responseCode = "200", description = "OK",
+    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ImportLog.class))))
     public ResponseEntity<List<ImportLog>> getAllLogsForStudy(
         @PathVariable("logType") String logType,
         @PathVariable("studyId") String studyId,
@@ -93,6 +95,8 @@ public class ImportController {
 
     @RequestMapping(value = "/api/importer/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get a list of all studies in the importer")
+    @ApiResponse(responseCode = "200", description = "OK",
+    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ImportStudy.class))))
     public ResponseEntity<List<ImportStudy>> getAllImporterStudies(Authentication authentication) {
         HttpGet request = new HttpGet("http://importer:8080/studies");
         setUserIdHeader(authentication, request);
@@ -110,6 +114,8 @@ public class ImportController {
 
     @RequestMapping(value = "/api/importer/{studyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get study details")
+    @ApiResponse(responseCode = "200", description = "OK",
+    content = @Content(schema = @Schema(implementation = ImportStudy.class)))
     public ResponseEntity<ImportStudy> getImporterStudy(
         @PathVariable("studyId") String studyId,
         Authentication authentication
@@ -130,6 +136,8 @@ public class ImportController {
 
     @RequestMapping(value = "/api/importer/{studyId}/import", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Run a trial import of the studyId")
+    @ApiResponse(responseCode = "200", description = "OK",
+    content = @Content(schema = @Schema(implementation = String.class)))
     public ResponseEntity<String> runTrialImport(
         @PathVariable("studyId") String studyId,
         Authentication authentication
@@ -149,6 +157,8 @@ public class ImportController {
 
     @RequestMapping(value = "/api/importer/{studyId}/validate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Run a trial validation of the studyId")
+    @ApiResponse(responseCode = "200", description = "OK",
+    content = @Content(schema = @Schema(implementation = String.class)))
     public ResponseEntity<String> runTrialValidation(
         @PathVariable("studyId") String studyId,
         Authentication authentication
