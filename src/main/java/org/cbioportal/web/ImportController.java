@@ -2,6 +2,10 @@ package org.cbioportal.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,6 +15,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.cbioportal.model.importer.ImportLog;
 import org.cbioportal.model.importer.ImportStudy;
+import org.cbioportal.model.Gene;
 import org.cbioportal.model.User;
 import org.cbioportal.service.importer.ImportService;
 import org.cbioportal.web.config.annotation.InternalApi;
@@ -39,8 +44,10 @@ public class ImportController {
     @Autowired
     ImportService importService;
 
-    @RequestMapping(value = "/logs/{logType}/{studyId}/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/logs/{logType}/{studyId}/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get the specified log file")
+    @ApiResponse(responseCode = "200", description = "OK",
+    content = @Content(schema = @Schema(implementation = ImportLog.class)))
     public ResponseEntity<ImportLog> getLog(
         @PathVariable("logType") String logType,
         @PathVariable("studyId") String studyId,
@@ -61,7 +68,7 @@ public class ImportController {
         }
     }
 
-    @RequestMapping(value = "/logs/{logType}/{studyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/logs/{logType}/{studyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get the specified log file")
     public ResponseEntity<List<ImportLog>> getAllLogsForStudy(
         @PathVariable("logType") String logType,
@@ -84,7 +91,7 @@ public class ImportController {
 
     }
 
-    @RequestMapping(value = "/importer/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/importer/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get a list of all studies in the importer")
     public ResponseEntity<List<ImportStudy>> getAllImporterStudies(Authentication authentication) {
         HttpGet request = new HttpGet("http://importer:8080/studies");
@@ -101,7 +108,7 @@ public class ImportController {
         }
     }
 
-    @RequestMapping(value = "/importer/{studyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/importer/{studyId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get study details")
     public ResponseEntity<ImportStudy> getImporterStudy(
         @PathVariable("studyId") String studyId,
@@ -121,7 +128,7 @@ public class ImportController {
         }
     }
 
-    @RequestMapping(value = "/importer/{studyId}/import", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/importer/{studyId}/import", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Run a trial import of the studyId")
     public ResponseEntity<String> runTrialImport(
         @PathVariable("studyId") String studyId,
@@ -140,7 +147,7 @@ public class ImportController {
         }
     }
 
-    @RequestMapping(value = "/importer/{studyId}/validate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/importer/{studyId}/validate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Run a trial validation of the studyId")
     public ResponseEntity<String> runTrialValidation(
         @PathVariable("studyId") String studyId,
