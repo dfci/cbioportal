@@ -58,6 +58,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 			"/oncoprinter**",
 			"/encodedRedirect",
 			"/datasets**",
+			"/importer**",
 			"/ln**",
             "/webAPI**",
             "/news**",
