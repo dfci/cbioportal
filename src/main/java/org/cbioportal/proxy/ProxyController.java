@@ -57,6 +57,9 @@ public class ProxyController {
 
     @Value("${darwin.regex:Test}")
     private String darwinRegex;
+    
+    @Value("${server.servlet.context-path:}")
+    private String contextPath;
 
     /**
      * This dev endpoint can be used (with a personal access token) instead of the production endpoint.
@@ -96,7 +99,7 @@ public class ProxyController {
         }
         
         String decodedBody = body == null ? null: this.monkifier.decodeBase64(body);
-        String encodedPath = request.getRequestURI().replaceFirst("/proxy/A8F74CD7851BDEE8DCD2E86AB4E2A711/", "");
+        String encodedPath = request.getRequestURI().replaceFirst(contextPath + "/proxy/A8F74CD7851BDEE8DCD2E86AB4E2A711/", "");
         String decodedPath = this.monkifier.decodeBase64(encodedPath);
         String decodedQueryString = this.monkifier.decodeQueryString(request);
         
