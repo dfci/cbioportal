@@ -1,7 +1,8 @@
-package org.cbioportal.proxy;
+package org.cbioportal.proxy.legacy;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.cbioportal.proxy.Monkifier;
 import org.cbioportal.proxy.util.CheckDarwinAccessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,13 +31,10 @@ import java.util.regex.Pattern;
 // See: https://stackoverflow.com/a/30686733/11651683
 
 @RestController
-@RequestMapping("/proxy")
+//@RequestMapping("/proxy")
 public class ProxyController {
     private static final String DEFAULT_ONCOKB_URL = "https://public.api.oncokb.org/api/v1";
 
-    @Autowired
-    private Monkifier monkifier;
-    
     @Value("${oncokb.token:}")
     private String oncokbToken;
     
@@ -98,10 +96,10 @@ public class ProxyController {
             throw new OncoKBProxyUserAgreementException();
         }
         
-        String decodedBody = body == null ? null: this.monkifier.decodeBase64(body);
+        String decodedBody = body == null ? null: Monkifier.decodeBase64(body);
         String encodedPath = request.getRequestURI().replaceFirst(contextPath + "/proxy/A8F74CD7851BDEE8DCD2E86AB4E2A711/", "");
-        String decodedPath = this.monkifier.decodeBase64(encodedPath);
-        String decodedQueryString = this.monkifier.decodeQueryString(request);
+        String decodedPath = Monkifier.decodeBase64(encodedPath);
+        String decodedQueryString = Monkifier.decodeQueryString(request);
         
         String response = exchangeOncokbData(
             decodedBody,
@@ -111,7 +109,7 @@ public class ProxyController {
             getOncokbHeaders(request)
         );
         
-        return "\"" + this.monkifier.encodeBase64(response) + "\"";
+        return "\"" + Monkifier.encodeBase64(response) + "\"";
     }
     
     private String exchangeOncokbData(

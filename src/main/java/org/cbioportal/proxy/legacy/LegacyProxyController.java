@@ -30,7 +30,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.cbioportal.proxy;
+package org.cbioportal.proxy.legacy;
 
 import java.io.IOException;
 import java.net.URI;
