@@ -107,6 +107,16 @@
 	</properties>
 
 	<dependencies>
+		<!--BEGIN  TEST AREA -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-gateway-mvc</artifactId>
+			<version>4.1.5</version>
+		</dependency>
+		
+		
+		<!-- END TEST AREA -->
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
