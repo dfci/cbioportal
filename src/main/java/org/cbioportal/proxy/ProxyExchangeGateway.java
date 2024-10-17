@@ -29,150 +29,147 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/proxy")
 @ConfigurationProperties(prefix = "proxy")
-@ConfigurationPropertiesScan 
+@ConfigurationPropertiesScan
 public class ProxyExchangeGateway {
 	private Map<String, String> routes;
-	
+
 	@Value("${oncokb.token:}")
-    private String oncokbToken;
-	
+	private String oncokbToken;
+
 	@Value("${server.servlet.context-path:}")
-    private String contextPath;
-	
+	private String contextPath;
+
 	@Value("${oncokb.public_api.url:https://public.api.oncokb.org/api/v1}")
-    private String oncokbApiUrl;
-	
+	private String oncokbApiUrl;
+
 	@Value("${show.oncokb:false}")
-    private Boolean showOncokb;
-	
-	
+	private Boolean showOncokb;
+
 	@RequestMapping("/**")
-	public ResponseEntity<?> proxy(ProxyExchange<byte[]> proxy, @RequestBody(required = false) String body, HttpServletRequest request, HttpMethod method) throws Exception {
+	public ResponseEntity<?> proxy(ProxyExchange<byte[]> proxy, @RequestBody(required = false) String body,
+			HttpServletRequest request, HttpMethod method) throws Exception {
 		String service = proxy.path("/proxy/").toString();
-		
-		
+
 		int endPosition = service.indexOf("/");
-		if(endPosition >= 0) {
+		if (endPosition >= 0) {
 			service = service.substring(0, endPosition);
 		}
-		
-		if(!routes.containsKey(service)) {
+
+		if (!routes.containsKey(service)) {
 			throw new UnknownServiceException();
 		}
+
+		String updatedPath = proxy.path("/proxy/" + service).trim();
+
+		String proxyServerHost = routes.get(service).trim();
+
+		ResponseEntity<?> response = null;
+
+		if (method == HttpMethod.DELETE) {
+			response = proxy.uri(proxyServerHost + updatedPath).body(body).delete();
+		} else if (method == HttpMethod.GET) {
+			response = proxy.uri(proxyServerHost + updatedPath).body(body).get();
+		} else if (method == HttpMethod.PATCH) {
+			response = proxy.uri(proxyServerHost + updatedPath).body(body).get();
+		} else if (method == HttpMethod.POST) {
+			response = proxy.uri(proxyServerHost + updatedPath).body(body).post();
+		} else if (method == HttpMethod.PUT) {
+			response = proxy.uri(proxyServerHost + updatedPath).body(body).put();
+		} else {
+			throw new UnknownServiceException();
+		}
+		// This removes the Transfer-Encoding that occurs when the proxy
+		// service does chunked response. However, it is not needed because the 
+		// way that ProxyExchange receives all before it moves forward. However,
+		// because it still has the header we need to remove it.
 		
-		String updatedPath = proxy.path("/proxy/" + service);
-		if(method == HttpMethod.DELETE) {
-			return proxy.uri(routes.get(service) + updatedPath).body(body).delete();
+		HttpHeaders newHeaders = new HttpHeaders();
+		for (String httpHeader : response.getHeaders().keySet()) {
+			if (httpHeader.equals("Transfer-Encoding")) {
+				continue;
+			}
+			newHeaders.put(httpHeader, response.getHeaders().get(httpHeader));
 		}
-		else if(method == HttpMethod.GET) {
-			return proxy.uri(routes.get(service) + updatedPath).body(body).get();
-		}
-		else if(method == HttpMethod.PATCH) {
-			return proxy.uri(routes.get(service) + updatedPath).body(body).get();
-		}
-		else if(method == HttpMethod.POST) {
-			return proxy.uri(routes.get(service) + updatedPath).body(body).post();
-		}
-		else if(method == HttpMethod.PUT) {
-			return proxy.uri(routes.get(service) + updatedPath).body(body).put();
-		}
-		
-		throw new UnknownServiceException();
+		return ResponseEntity.status(response.getStatusCode()).headers(newHeaders).body(response.getBody());
+
 	}
-	
+
 	// OnkoKB Specific Proxy
 	@RequestMapping("/A8F74CD7851BDEE8DCD2E86AB4E2A711/**")
-    public String proxyEncodedOncokb(
-        @RequestBody(required = false) String body,
-        HttpMethod method, 
-        HttpServletRequest request
-    ) throws URISyntaxException, UnsupportedEncodingException {
-        // make sure that the custom Proxy User Agreement header exists
-        String proxyUserAgreement = request.getHeader("X-Proxy-User-Agreement");
-        if (proxyUserAgreement == null || !proxyUserAgreement.equals(
-            "I/We do NOT use this obfuscated proxy to programmatically obtain private OncoKB data. " +
-            "I/We know that I/we should get a valid data access token by registering at https://www.oncokb.org/account/register."
-        )) {
-            throw new OncoKBProxyUserAgreementException();
-        }
-        
-        String decodedBody = body == null ? null: Monkifier.decodeBase64(body);
-        String encodedPath = request.getRequestURI().replaceFirst(contextPath + "/proxy/A8F74CD7851BDEE8DCD2E86AB4E2A711/", "");
-        String decodedPath = Monkifier.decodeBase64(encodedPath);
-        String decodedQueryString = Monkifier.decodeQueryString(request);
-        
-        String response = exchangeOncokbData(
-            decodedBody,
-            decodedPath,
-            decodedQueryString,
-            method,
-            getOncokbHeaders(request)
-        );
-        
-        return "\"" + Monkifier.encodeBase64(response) + "\"";
-    }
-	
-	private String exchangeOncokbData(
-	        String body,
-	        String pathInfo,
-	        String queryString,
-	        HttpMethod method,
-	        HttpHeaders httpHeaders
-	    ) throws URISyntaxException {
-	        return exchangeData(
-	            body,
-	            buildUri(this.oncokbApiUrl + pathInfo, queryString),
-	            method,
-	            httpHeaders,
-	            String.class
-	        ).getBody();
-	    }
-	
-	private <T> ResponseEntity<T> exchangeData(String body, URI uri, HttpMethod method, HttpHeaders httpHeaders, Class<T> responseType) {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        return restTemplate.exchange(uri, method, new HttpEntity<>(body, httpHeaders), responseType);
-    }
-	
+	public String proxyEncodedOncokb(@RequestBody(required = false) String body, HttpMethod method,
+			HttpServletRequest request) throws URISyntaxException, UnsupportedEncodingException {
+		// make sure that the custom Proxy User Agreement header exists
+		String proxyUserAgreement = request.getHeader("X-Proxy-User-Agreement");
+		if (proxyUserAgreement == null || !proxyUserAgreement
+				.equals("I/We do NOT use this obfuscated proxy to programmatically obtain private OncoKB data. "
+						+ "I/We know that I/we should get a valid data access token by registering at https://www.oncokb.org/account/register.")) {
+			throw new OncoKBProxyUserAgreementException();
+		}
+
+		String decodedBody = body == null ? null : Monkifier.decodeBase64(body);
+		String encodedPath = request.getRequestURI()
+				.replaceFirst(contextPath + "/proxy/A8F74CD7851BDEE8DCD2E86AB4E2A711/", "");
+		String decodedPath = Monkifier.decodeBase64(encodedPath);
+		String decodedQueryString = Monkifier.decodeQueryString(request);
+
+		String response = exchangeOncokbData(decodedBody, decodedPath, decodedQueryString, method,
+				getOncokbHeaders(request));
+
+		return "\"" + Monkifier.encodeBase64(response) + "\"";
+	}
+
+	private String exchangeOncokbData(String body, String pathInfo, String queryString, HttpMethod method,
+			HttpHeaders httpHeaders) throws URISyntaxException {
+		return exchangeData(body, buildUri(this.oncokbApiUrl + pathInfo, queryString), method, httpHeaders,
+				String.class).getBody();
+	}
+
+	private <T> ResponseEntity<T> exchangeData(String body, URI uri, HttpMethod method, HttpHeaders httpHeaders,
+			Class<T> responseType) {
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+		return restTemplate.exchange(uri, method, new HttpEntity<>(body, httpHeaders), responseType);
+	}
+
 	private HttpHeaders getOncokbHeaders(HttpServletRequest request, String token) {
-        String oncokbToken = token == null ? this.oncokbToken : token;
+		String oncokbToken = token == null ? this.oncokbToken : token;
 
-        if (!this.showOncokb) {
-            throw new OncoKBServiceIsDisabledException();
-        }
+		if (!this.showOncokb) {
+			throw new OncoKBServiceIsDisabledException();
+		}
 
-        HttpHeaders httpHeaders = initHeaders(request);
-        
-        if (!StringUtils.isEmpty(oncokbToken)) {
-            httpHeaders.add("Authorization", "Bearer " + oncokbToken);
-        }
-        
-        return httpHeaders;
-    }
-	
+		HttpHeaders httpHeaders = initHeaders(request);
+
+		if (!StringUtils.isEmpty(oncokbToken)) {
+			httpHeaders.add("Authorization", "Bearer " + oncokbToken);
+		}
+
+		return httpHeaders;
+	}
+
 	private HttpHeaders initHeaders(HttpServletRequest request) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        
-        String contentType = request.getHeader("Content-Type");
-        if (contentType != null) {
-            httpHeaders.setContentType(MediaType.valueOf(contentType));
-        }
-        
-        return httpHeaders;
-    }
-	
+		HttpHeaders httpHeaders = new HttpHeaders();
+
+		String contentType = request.getHeader("Content-Type");
+		if (contentType != null) {
+			httpHeaders.setContentType(MediaType.valueOf(contentType));
+		}
+
+		return httpHeaders;
+	}
+
 	@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "OncoKB service is disabled")
-    public class OncoKBServiceIsDisabledException extends RuntimeException {
-    }
-	
+	public class OncoKBServiceIsDisabledException extends RuntimeException {
+	}
+
 	private HttpHeaders getOncokbHeaders(HttpServletRequest request) {
-        return this.getOncokbHeaders(request, null);
-    }
-	
+		return this.getOncokbHeaders(request, null);
+	}
+
 	private URI buildUri(String path, String queryString) throws URISyntaxException {
-        return new URI(path + (queryString == null ? "" : "?" + queryString));
-    }
-	
+		return new URI(path + (queryString == null ? "" : "?" + queryString));
+	}
+
 	public Map<String, String> getRoutes() {
 		return routes;
 	}
@@ -182,9 +179,9 @@ public class ProxyExchangeGateway {
 	}
 
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Fair Usage Agreement is missing")
-    public class OncoKBProxyUserAgreementException extends RuntimeException {
-    }
-	
+	public class OncoKBProxyUserAgreementException extends RuntimeException {
+	}
+
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Unknown Service")
 	public class UnknownServiceException extends RuntimeException {
 	}
