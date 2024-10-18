@@ -63,7 +63,8 @@ public class WebAppConfig implements WebMvcConfigurer {
             "/webAPI**",
             "/news**",
             "/visualize**",
-            "/test**"
+            "/test**",
+            "/DownloadProfileData"
 		);
 
 		endpoints.forEach( route -> registry.addViewController(route).setViewName(SINGLE_PAGE_APP_ROOT));

@@ -18,11 +18,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -47,7 +51,7 @@ public class ProxyExchangeGateway {
 
 	@RequestMapping("/**")
 	public ResponseEntity<?> proxy(ProxyExchange<byte[]> proxy, @RequestBody(required = false) String body,
-			HttpServletRequest request, HttpMethod method) throws Exception {
+			HttpServletRequest request, HttpMethod method, @RequestParam(required = false) MultiValueMap<String, String> params) throws Exception {
 		String service = proxy.path("/proxy/").toString();
 
 		int endPosition = service.indexOf("/");
@@ -62,19 +66,21 @@ public class ProxyExchangeGateway {
 		String updatedPath = proxy.path("/proxy/" + service).trim();
 
 		String proxyServerHost = routes.get(service).trim();
-
+		
 		ResponseEntity<?> response = null;
+		
+		UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(proxyServerHost + updatedPath).queryParams(params).build();
 
 		if (method == HttpMethod.DELETE) {
-			response = proxy.uri(proxyServerHost + updatedPath).body(body).delete();
+			response = proxy.uri(uriComponents.toUri()).body(body).delete();
 		} else if (method == HttpMethod.GET) {
-			response = proxy.uri(proxyServerHost + updatedPath).body(body).get();
+			response = proxy.uri(uriComponents.toUri()).body(body).get();
 		} else if (method == HttpMethod.PATCH) {
-			response = proxy.uri(proxyServerHost + updatedPath).body(body).get();
+			response = proxy.uri(uriComponents.toUri()).body(body).get();
 		} else if (method == HttpMethod.POST) {
-			response = proxy.uri(proxyServerHost + updatedPath).body(body).post();
+			response = proxy.uri(uriComponents.toUri()).body(body).post();
 		} else if (method == HttpMethod.PUT) {
-			response = proxy.uri(proxyServerHost + updatedPath).body(body).put();
+			response = proxy.uri(uriComponents.toUri()).body(body).put();
 		} else {
 			throw new UnknownServiceException();
 		}
