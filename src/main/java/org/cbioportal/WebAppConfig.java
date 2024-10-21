@@ -29,6 +29,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/images/**").addResourceLocations("classpath:/webapp/images/");
 		registry.addResourceHandler("/reactapp/**").addResourceLocations("classpath:/reactapp/");
 		registry.addResourceHandler("/js/**").addResourceLocations("classpath:/js/");
+		registry.addResourceHandler("/profile_latest.tar.gz").addResourceLocations("classpath:/profile_latest.tar.gz");
 	}
 
 	@Override
