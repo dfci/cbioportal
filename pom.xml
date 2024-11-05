@@ -27,7 +27,7 @@
 		<!--        TODO replace with version of cbioportal frontend with compatible
         login url-->
 		<frontend.groupId>com.github.dfci</frontend.groupId>
-		<frontend.version>18c62663622b5daf412d0965ae173d1f7659c60a</frontend.version>
+		<frontend.version>87449f13f3abd9010871c3e387521908dadc69f6</frontend.version>
 
         <!-- THIS SHOULD BE KEPT IN SYNC TO VERSION IN CGDS.SQL -->
 		<db.version>2.13.1</db.version>
@@ -320,12 +320,6 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 		<!-- JitPack Publishing -->
-		<dependency>
-			<groupId>com.github.jitpack</groupId>
-			<artifactId>maven-simple</artifactId>
-			<version>0.1</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>

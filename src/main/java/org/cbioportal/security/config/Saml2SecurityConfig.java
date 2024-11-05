@@ -67,6 +67,7 @@ public class Saml2SecurityConfig {
 				// https://docs.spring.io/spring-security/reference/6.1/servlet/saml2/logout.html
 				// Logout Service POST Binding URL: http://localhost:8080/logout/saml2/slo
 				.logout(logout -> logout.logoutUrl(LOGOUT_URL)
+						.logoutSuccessUrl("/")
 						.logoutSuccessHandler(logoutSuccessHandler(relyingPartyRegistrationRepository)))
 				.build();
 	}
@@ -115,7 +116,8 @@ public class Saml2SecurityConfig {
 		DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(
 				relyingPartyRegistrationRepository);
 		OpenSaml4LogoutRequestResolver logoutRequestResolver = new OpenSaml4LogoutRequestResolver(
-				relyingPartyRegistrationResolver);
+				relyingPartyRegistrationResolver); 
+		
 
 		return new Saml2RelyingPartyInitiatedLogoutSuccessHandler(logoutRequestResolver);
 	}
