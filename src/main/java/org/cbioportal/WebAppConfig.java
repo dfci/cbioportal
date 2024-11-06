@@ -60,6 +60,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 			"/encodedRedirect",
 			"/datasets**",
 			"/importer**",
+			"/import/*",
 			"/ln**",
             "/webAPI**",
             "/news**",
