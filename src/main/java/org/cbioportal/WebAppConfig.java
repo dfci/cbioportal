@@ -61,6 +61,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 			"/datasets**",
 			"/importer**",
 			"/import/*",
+			"/logs/*"
 			"/ln**",
             "/webAPI**",
             "/news**",

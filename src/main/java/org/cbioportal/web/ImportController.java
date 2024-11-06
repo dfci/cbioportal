@@ -165,6 +165,7 @@ public class ImportController {
 	}
 
 	private void setUserIdHeader(Authentication authentication, HttpGet request) {
+		//TODO: This will need to be updated to support more than just the SAML2 Principal method
 		String id = ((Saml2AuthenticatedPrincipal) authentication.getPrincipal()).getFirstAttribute("username");
 
 		request.setHeader("requesterId", id);
