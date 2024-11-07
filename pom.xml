@@ -27,7 +27,7 @@
 		<!--        TODO replace with version of cbioportal frontend with compatible
         login url-->
 		<frontend.groupId>com.github.dfci</frontend.groupId>
-		<frontend.version>87449f13f3abd9010871c3e387521908dadc69f6</frontend.version>
+		<frontend.version>85de57c6c675fa76095191a0e4455fc553a9beda</frontend.version>
 
         <!-- THIS SHOULD BE KEPT IN SYNC TO VERSION IN CGDS.SQL -->
 		<db.version>2.13.1</db.version>
