@@ -47,6 +47,9 @@ public class Saml2SecurityConfig {
 	@Value("${saml.idp.metadata.attribute.role:Role}")
 	private String roleAttributeName;
 
+	@Value("${saml.logout.url}")
+	private String successfullLogoutUrl;
+
 	@Autowired
 	public Saml2SecurityConfig(SecurityRepository securityRepository) {
 		this.securityRepository = securityRepository;
@@ -62,13 +65,10 @@ public class Saml2SecurityConfig {
 				.exceptionHandling(eh -> eh.defaultAuthenticationEntryPointFor(
 						new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), AntPathRequestMatcher.antMatcher("/api/**")))
 				.saml2Login(withDefaults())
-				// NOTE: I did not get the official .saml2Logout() DSL to work as
-				// described at
-				// https://docs.spring.io/spring-security/reference/6.1/servlet/saml2/logout.html
-				// Logout Service POST Binding URL: http://localhost:8080/logout/saml2/slo
-				.logout(logout -> logout.logoutUrl(LOGOUT_URL)
-						.logoutSuccessUrl("/")
-						.logoutSuccessHandler(logoutSuccessHandler(relyingPartyRegistrationRepository)))
+				.logout(logout -> 
+					logout.logoutUrl(LOGOUT_URL)
+					.logoutSuccessUrl(successfullLogoutUrl)
+				)
 				.build();
 	}
 
@@ -116,7 +116,7 @@ public class Saml2SecurityConfig {
 		DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(
 				relyingPartyRegistrationRepository);
 		OpenSaml4LogoutRequestResolver logoutRequestResolver = new OpenSaml4LogoutRequestResolver(
-				relyingPartyRegistrationResolver); 
+				relyingPartyRegistrationResolver);
 		
 
 		return new Saml2RelyingPartyInitiatedLogoutSuccessHandler(logoutRequestResolver);
