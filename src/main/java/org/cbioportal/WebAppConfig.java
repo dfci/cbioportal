@@ -30,6 +30,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/reactapp/**").addResourceLocations("classpath:/reactapp/");
 		registry.addResourceHandler("/js/**").addResourceLocations("classpath:/js/");
 		registry.addResourceHandler("/profile_latest.tar.gz").addResourceLocations("classpath:/profile_latest.tar.gz");
+		registry.addResourceHandler("/ip-images/**").addResourceLocations("classpath:/ip-images/");
 	}
 
 	@Override
@@ -59,9 +60,8 @@ public class WebAppConfig implements WebMvcConfigurer {
 			"/oncoprinter**",
 			"/encodedRedirect",
 			"/datasets**",
-			"/importer**",
 			"/import/*",
-			"/ip-images/**",
+			"/importer**",
 			"/logs/**",
 			"/ln**",
             "/webAPI**",
