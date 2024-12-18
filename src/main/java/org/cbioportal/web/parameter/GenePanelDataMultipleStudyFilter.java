@@ -2,15 +2,17 @@ package org.cbioportal.web.parameter;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Size;
+
 import java.util.List;
 import java.io.Serializable;
 
 public class GenePanelDataMultipleStudyFilter implements Serializable {
 
-    @Size(min = 0, max = PagingConstants.MAX_PAGE_SIZE)
+    @Size(min = 1, max = PagingConstants.MAX_PAGE_SIZE)
     private List<SampleMolecularIdentifier> sampleMolecularIdentifiers;
-    @Size(min = 0, max = PagingConstants.MAX_PAGE_SIZE)
+    @Size(min = 1, max = PagingConstants.MAX_PAGE_SIZE)
     private List<String> molecularProfileIds;
+    
 
     @AssertTrue
     private boolean isEitherMolecularProfileIdsOrSampleMolecularIdentifiersPresent() {
