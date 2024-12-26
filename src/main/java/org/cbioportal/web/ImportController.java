@@ -49,7 +49,7 @@ public class ImportController {
 	@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ImportLog.class)))
 	public ResponseEntity<ImportLog> getLog(@PathVariable("logType") String logType,
 			@PathVariable("studyId") String studyId, @PathVariable("id") String id, Authentication authentication) {
-		HttpGet request = new HttpGet("http://importer:8080/log/" + studyId + "/" + id);
+		HttpGet request = new HttpGet("http://localhost:8584/log/" + studyId + "/" + id);
 		setUserIdHeader(authentication, request);
 
 		try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -68,7 +68,7 @@ public class ImportController {
 	@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ImportLog.class))))
 	public ResponseEntity<List<ImportLog>> getAllLogsForStudy(@PathVariable("logType") String logType,
 			@PathVariable("studyId") String studyId, Authentication authentication) {
-		HttpGet request = new HttpGet("http://importer:8080/logs/" + studyId + "/" + logType);
+		HttpGet request = new HttpGet("http://localhost:8584/logs/" + studyId + "/" + logType);
 		setUserIdHeader(authentication, request);
 
 		try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -88,7 +88,7 @@ public class ImportController {
 	@Operation(description = "Get a list of all studies in the importer")
 	@ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ImportStudy.class))))
 	public ResponseEntity<List<ImportStudy>> getAllImporterStudies(Authentication authentication) {
-		HttpGet request = new HttpGet("http://importer:8080/studies");
+		HttpGet request = new HttpGet("http://localhost:8584/studies");
 		setUserIdHeader(authentication, request);
 
 		try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -108,7 +108,7 @@ public class ImportController {
 	@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ImportStudy.class)))
 	public ResponseEntity<ImportStudy> getImporterStudy(@PathVariable("studyId") String studyId,
 			Authentication authentication) {
-		HttpGet request = new HttpGet("http://importer:8080/studies/" + studyId);
+		HttpGet request = new HttpGet("http://localhost:8584/studies/" + studyId);
 		setUserIdHeader(authentication, request);
 
 		try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -128,7 +128,7 @@ public class ImportController {
 	public ResponseEntity<String> runTrialImport(@PathVariable("studyId") String studyId, Authentication authentication)
 			throws IOException, InterruptedException {
 		String username = getUserName(authentication);
-		HttpGet request = new HttpGet("http://importer:8080/importer/" + studyId + "/" + username + "/import");
+		HttpGet request = new HttpGet("http://localhost:8584/importer/" + studyId + "/" + username + "/import");
 		setUserIdHeader(authentication, request);
 
 		try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -146,7 +146,7 @@ public class ImportController {
 	public ResponseEntity<String> runTrialValidation(@PathVariable("studyId") String studyId,
 			Authentication authentication) throws IOException, InterruptedException {
 		String username = getUserName(authentication);
-		HttpGet request = new HttpGet("http://importer:8080/importer/" + studyId + "/" + username + "/validate");
+		HttpGet request = new HttpGet("http://localhost:8584/importer/" + studyId + "/" + username + "/validate");
 		setUserIdHeader(authentication, request);
 
 		try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -166,7 +166,8 @@ public class ImportController {
 
 	private void setUserIdHeader(Authentication authentication, HttpGet request) {
 		//TODO: This will need to be updated to support more than just the SAML2 Principal method
-		String id = ((Saml2AuthenticatedPrincipal) authentication.getPrincipal()).getFirstAttribute("username");
+//		String id = ((Saml2AuthenticatedPrincipal) authentication.getPrincipal()).getFirstAttribute("username");
+		String id = "JE011";
 
 		request.setHeader("requesterId", id);
 	}
