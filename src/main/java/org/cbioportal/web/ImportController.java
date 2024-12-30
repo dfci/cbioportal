@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -165,10 +167,7 @@ public class ImportController {
 	}
 
 	private void setUserIdHeader(Authentication authentication, HttpGet request) {
-		//TODO: This will need to be updated to support more than just the SAML2 Principal method
-//		String id = ((Saml2AuthenticatedPrincipal) authentication.getPrincipal()).getFirstAttribute("username");
-		String id = "JE011";
-
+		String id = authentication == null ? "no_auth" : authentication.getName();
 		request.setHeader("requesterId", id);
 	}
 }
