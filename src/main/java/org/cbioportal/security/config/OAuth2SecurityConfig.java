@@ -72,7 +72,8 @@ public class OAuth2SecurityConfig {
             .logout(logout -> logout
                 .logoutUrl(LOGOUT_URL)
                 .logoutSuccessUrl(successfullLogoutUrl)
-            );
+            )
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
         return http.build();
     }
     
