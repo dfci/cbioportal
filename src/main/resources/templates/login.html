@@ -61,8 +61,6 @@
                                         <a href="./">
                                             <button
                                                 style="padding: 0; border:none; background: none" >
-                                                <img th:if="${url.key == 'google'}" src="./images/login/googleplus_signin.png" alt="CBioPortal Google Logo" style="height: 50px">
-                                                <img th:if="${url.key == 'azure'}" src="./images/login/microsoft_signin.png" alt="CBioPortal Microsoft Logo" style="height: 50px">
                                                 <div 
                                                     style="border: 1px black solid;min-width: 282px;min-height: 50px; margin: auto; text-align: center; background-color: lightgray"
                                                     th:if="${url.key != 'azure' && url.key != 'google'}">

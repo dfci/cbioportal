@@ -30,7 +30,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.cbioportal.proxy.legacy;
+package org.cbioportal.proxy;
 
 import java.io.IOException;
 import java.net.URI;
@@ -56,7 +56,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Controller
 @RequestMapping("/api/proxy")
-public class LegacyProxyController {
+public class APIProxyController {
 
     private String bitlyURL;
     private String sessionServiceURL;
