@@ -70,24 +70,27 @@ public class ProxyExchangeGateway {
 		ResponseEntity<?> response = null;
 		
 		UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(proxyServerHost + updatedPath).queryParams(params).build();
-
-		if (method == HttpMethod.DELETE) {
-			response = proxy.uri(uriComponents.toUri()).body(body).delete();
-		} else if (method == HttpMethod.GET) {
-			response = proxy.uri(uriComponents.toUri()).body(body).get();
-		} else if (method == HttpMethod.PATCH) {
-			response = proxy.uri(uriComponents.toUri()).body(body).get();
-		} else if (method == HttpMethod.POST) {
-			response = proxy.uri(uriComponents.toUri()).body(body).post();
-		} else if (method == HttpMethod.PUT) {
-			response = proxy.uri(uriComponents.toUri()).body(body).put();
-		} else {
-			throw new UnknownServiceException();
+		
+		switch(method.name()) {
+			case "DELETE":
+				response = proxy.uri(uriComponents.toUri()).body(body).delete();
+				break;
+			case "GET":
+				response = proxy.uri(uriComponents.toUri()).body(body).get();
+				break;
+			case "PATCH":
+				response = proxy.uri(uriComponents.toUri()).body(body).get();
+				break;
+			case "POST":
+				response = proxy.uri(uriComponents.toUri()).body(body).post();
+				break;
+			case "PUT":
+				response = proxy.uri(uriComponents.toUri()).body(body).put();
+				break;
+			default:
+				throw new UnknownServiceException();
+			
 		}
-		// This removes the Transfer-Encoding that occurs when the proxy
-		// service does chunked response. However, it is not needed because the 
-		// way that ProxyExchange receives all before it moves forward. However,
-		// because it still has the header we need to remove it.
 		
 		HttpHeaders newHeaders = new HttpHeaders();
 		for (String httpHeader : response.getHeaders().keySet()) {
