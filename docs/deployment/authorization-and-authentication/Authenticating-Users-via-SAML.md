@@ -20,7 +20,7 @@ In its simplest terms, SAML boils down to four terms:
 
 ## Why is SAML Relevant to cBioPortal?
 
-cBioPortal has no means of directly authenticating users. If you want to restrict access to your instance of cBioPortal, you therefore have to consider an external authentication service.  SAML is one means of doing so, and your larger institution may already provide SAML support.  For example, at Sloan Kettering and Dana-Farber, users of the internal cBioPortal instances login with their regular credentials via SAML.  This greatly simplifies user management.
+cBioPortal has no means of directly authenticating users. If you want to restrict access to your instance of cBioPortal, you therefore have to consider an external authentication service.  SAML is one means of doing so, and your larger institution may already provide SAML support.  For example, at Memorial Sloan Kettering and Dana-Farber, users of the internal cBioPortal instances login with their regular credentials via SAML.  This greatly simplifies user management.
 
 # Setting up an Identity Provider
 
@@ -127,7 +127,7 @@ Within application.properties, make sure that:
 
 Then, modify the section labeled `authentication`. See SAML parameters shown in example below:
 
-```
+ ```
 spring.security.saml2.relyingparty.registration.cbio-idp.assertingparty.metadata-uri=https://ksg.dfci.harvard.edu/keycloak/realms/partners/protocol/saml/descriptor
 spring.security.saml2.relyingparty.registration.cbio-idp.entity-id=cbioportal
 spring.security.saml2.relyingparty.registration.cbio-idp.signing.credentials[0].certificate-location=classpath:/samlCertificate.crt
@@ -148,7 +148,7 @@ In the case that you are running cBioPortal behind a reverse proxy that handles 
     # local logout followed by a redirect to a global logout page:
     saml.logout.local=true
     saml.logout.url=<idp specific logout URL, e.g. https://idp.logoutpage.com >
-    
+
 
 ## Authorizing Users
 
@@ -161,13 +161,15 @@ The login page is configurable via the `application.properties` properties `skin
 For example in `skin.authorization_message` you can be set to something like this:
 
 ```
-skin.authorization_message= Welcome to this portal. Access to this portal is available to authorized test users at YOUR ORG.  [<a href="https://youorg.com/">Request Access</a>].
+skin.authorization_message= Welcome to this portal. Access to this portal is available to authorized test users at YOUR ORG. [<a href="https://youorg.com/">Request Access</a>].
 ```
 
+You can also set a standard text in `skin.login.contact_html` that will appear in case of problems: 
 
 ```
 skin.login.contact_html=If you think you have received this message in error, please contact us at <a style="color:#FF0000" href="mailto:cbioportal-access@your.org">cbioportal-access@your.org</a>
 ```
+
 
 ## Doing a Test Run
 
