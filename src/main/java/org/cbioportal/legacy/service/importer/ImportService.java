@@ -2,8 +2,8 @@ package org.cbioportal.legacy.service.importer;
 
 import java.util.List;
 import org.cbioportal.legacy.model.User;
-import org.cbioportal.model.importer.ImportLog;
-import org.cbioportal.model.importer.ImportStudy;
+import org.cbioportal.legacy.model.importer.ImportLog;
+import org.cbioportal.legacy.model.importer.ImportStudy;
 
 public interface ImportService {
   ImportStudy getStudy(String study);

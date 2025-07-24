@@ -1,4 +1,4 @@
-package org.cbioportal.model.importer;
+package org.cbioportal.legacy.model.importer;
 
 public enum ImportLogType {
   Validation,

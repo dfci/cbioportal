@@ -110,3 +110,5 @@ security.properties
 *.crt
 *.key
 *.pem
+src/main/resources/downloads/*
+!src/main/resources/downloads/.gitkeep

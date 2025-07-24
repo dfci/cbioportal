@@ -1,4 +1,4 @@
-package org.cbioportal.security.config;
+package org.cbioportal.application.security.config;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

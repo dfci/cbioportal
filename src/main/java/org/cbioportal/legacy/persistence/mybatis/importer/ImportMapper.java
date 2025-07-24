@@ -1,8 +1,8 @@
 package org.cbioportal.legacy.persistence.mybatis.importer;
 
 import java.util.List;
-import org.cbioportal.model.importer.ImportLog;
-import org.cbioportal.model.importer.ImportStudy;
+import org.cbioportal.legacy.model.importer.ImportLog;
+import org.cbioportal.legacy.model.importer.ImportStudy;
 
 public interface ImportMapper {
   ImportStudy getStudy(String study);

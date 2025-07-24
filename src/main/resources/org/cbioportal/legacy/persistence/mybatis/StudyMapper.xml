@@ -178,7 +178,7 @@
         </where>
     </select>
     
-    <resultMap id="collidingSamplesResultMap" type="org.cbioportal.model.StudyAndSampleIds">
+    <resultMap id="collidingSamplesResultMap" type="org.cbioportal.legacy.model.StudyAndSampleIds">
         <result property="studyId" column="STUDY_IDENTIFIER"/>
         <result property="studyName" column="NAME"/>
         <collection property="sampleIds" ofType="java.lang.String" javaType="java.util.HashSet">

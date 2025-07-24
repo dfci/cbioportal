@@ -1,4 +1,4 @@
-package org.cbioportal.model.importer;
+package org.cbioportal.legacy.model.importer;
 
 import java.util.Date;
 import java.util.List;

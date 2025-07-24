@@ -1,9 +1,9 @@
 package org.cbioportal.legacy.persistence.mybatis.importer;
 
 import java.util.List;
+import org.cbioportal.legacy.model.importer.ImportLog;
+import org.cbioportal.legacy.model.importer.ImportStudy;
 import org.cbioportal.legacy.persistence.importer.ImportRepository;
-import org.cbioportal.model.importer.ImportLog;
-import org.cbioportal.model.importer.ImportStudy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
