@@ -30,6 +30,10 @@ public class WebAppConfig implements WebMvcConfigurer {
     registry.addResourceHandler("/images/**").addResourceLocations("classpath:/webapp/images/");
     registry.addResourceHandler("/reactapp/**").addResourceLocations("classpath:/reactapp/");
     registry.addResourceHandler("/js/**").addResourceLocations("classpath:/js/");
+    registry
+        .addResourceHandler("/profile_latest.tar.gz")
+        .addResourceLocations("classpath:/downloads/");
+    registry.addResourceHandler("/ip-images/**").addResourceLocations("classpath:/ip-images/");
   }
 
   @Override
@@ -39,14 +43,12 @@ public class WebAppConfig implements WebMvcConfigurer {
     registry.addRedirectViewController(
         "/tutorials", "https://docs.cbioportal.org/user-guide/overview/#tutorial-slides");
     registry.addRedirectViewController("/oql", "https://docs.cbioportal.org/user-guide/oql/");
-    registry.addRedirectViewController("/donate", "https://docs.cbioportal.org/donate/");
+    registry.addRedirectViewController("/faq", "https://docs.cbioportal.org/user-guide/faq/");
 
     List<String> endpoints =
         List.of(
             "/results/*",
             "/results**",
-            "/results/comparison/*",
-            "/results/pathways/*",
             "/patient/*",
             "/patient**",
             "/study/*",
@@ -63,10 +65,15 @@ public class WebAppConfig implements WebMvcConfigurer {
             "/oncoprinter**",
             "/encodedRedirect",
             "/datasets**",
+            "/import/*",
+            "/importer**",
+            "/logs/**",
             "/ln**",
             "/webAPI**",
             "/news**",
-            "/visualize**");
+            "/visualize**",
+            "/test**",
+            "/DownloadProfileData");
 
     endpoints.forEach(route -> registry.addViewController(route).setViewName(SINGLE_PAGE_APP_ROOT));
   }

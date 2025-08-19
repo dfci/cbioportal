@@ -8,8 +8,6 @@ import org.cbioportal.legacy.utils.config.annotation.ConditionalOnProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +23,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @ConditionalOnProperty(
     name = "authenticate",
-    havingValue = {"false", "optional_oauth2"},
+    havingValue = {"false", "noauthsessionservice", "optional_oauth2"},
     isNot = true)
 public class ApiSecurityConfig {
 
@@ -36,7 +34,6 @@ public class ApiSecurityConfig {
   // https://spring.io/guides/topicals/spring-security-architecture
 
   @Bean
-  @Order(Ordered.HIGHEST_PRECEDENCE)
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http, @Nullable DataAccessTokenService tokenService) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -49,7 +46,6 @@ public class ApiSecurityConfig {
                         "/api/swagger-resources/**",
                         "/api/swagger-ui.html",
                         "/api/health",
-                        "/api/public_virtual_studies/**",
                         "/api/cache/**")
                     .permitAll()
                     .anyRequest()

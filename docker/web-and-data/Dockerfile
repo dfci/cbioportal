@@ -37,18 +37,18 @@ RUN apt-get update; apt-get install -y --no-install-recommends \
         python3-setuptools \
         python3-dev \
         python3-pip \
-        unzip \
-    && rm -rf /var/lib/apt/lists/*
+        unzip
+RUN rm -rf /var/lib/apt/lists/*
+RUN pip3 install wheel --break-system-packages
 
 # copy over core files and data-related scripts
 RUN mkdir -p /cbioportal
 
 #Download core files
-RUN wget https://github.com/cBioPortal/cbioportal-core/releases/download/v1.0.10/core-1.0.10.jar -P core/ ; cd core ; jar -xf core-1.0.10.jar scripts/ requirements.txt ; chmod -R a+x scripts/ ; cd ..;
+RUN wget https://github.com/cBioPortal/cbioportal-core/releases/download/v1.0.11/core-1.0.11.jar -P core/ ; cd core ; jar -xf core-1.0.11.jar scripts/ requirements.txt ; chmod -R a+x scripts/ ; cd ..;
 
 
 COPY --from=build /cbioportal/src/main/resources/db-scripts /cbioportal/db-scripts
-COPY --from=build /cbioportal/test/test_data/study_es_0 /cbioportal/test/study_es_0
 
 # install build and runtime dependencies
 # ignore update failure980[1298[01 w2308s
