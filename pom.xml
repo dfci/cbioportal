@@ -12,7 +12,7 @@
 
   <groupId>io.github.cbioportal</groupId>
   <artifactId>cbioportal</artifactId>
-  <version>v6.3.1</version>
+  <version>v6.3.1-dfci</version>
   <packaging>jar</packaging>
   <description>cBioPortal for Cancer Genomics</description>
 
@@ -131,6 +131,13 @@
   </scm>
 
   <dependencies>
+    <!--BEGIN  TEST AREA -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-gateway-mvc</artifactId>
+      <version>4.1.5</version>
+    </dependency>
+    <!-- END TEST AREA -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
