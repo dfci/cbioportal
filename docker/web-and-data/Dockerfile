@@ -12,6 +12,18 @@
 # plugin needs it), but excluded from the final image. No confidential
 # information is exposed. (see: stackoverflow.com/questions/56278325)
 ARG CORE_BRANCH=rfc100-rc
+ARG FRONTEND_BRANCH=v.7.0.1-dfci
+
+# Build the DFCI-customized frontend from source instead of pulling a prebuilt
+# jar from JitPack: JitPack's build environment lags behind (stale JDK/glibc),
+# so on-demand builds of recent frontend commits fail there. Building here uses
+# our own (current) maven image instead, sidestepping that entirely.
+FROM maven:3-eclipse-temurin-21 AS build-frontend
+ARG FRONTEND_BRANCH
+# This invalidates the Docker cache iff the latest commit hash for FRONTEND_BRANCH has changed
+ADD https://api.github.com/repos/dfci/cbioportal-frontend/commits/${FRONTEND_BRANCH} /dev/null
+RUN git clone --branch ${FRONTEND_BRANCH} --depth 1 https://github.com/dfci/cbioportal-frontend.git /cbioportal-frontend \
+    && mvn -f /cbioportal-frontend/pom.xml -q clean install -DskipTests -Dgpg.skip=true
 
 FROM maven:3-eclipse-temurin-21 AS build
 
@@ -27,6 +39,11 @@ WORKDIR /cbioportal
 # runner, forcing a full re-download whenever source changes.
 COPY pom.xml version.sh ./
 RUN mvn -q dependency:go-offline --fail-never
+
+# Make the freshly-built frontend-cbioportal jar available in this stage's
+# local repo so the dependency-plugin `unpack` (bound to prepare-package,
+# below) can resolve it without reaching out to JitPack.
+COPY --from=build-frontend /root/.m2/repository/io/github/cbioportal/frontend-cbioportal /root/.m2/repository/io/github/cbioportal/frontend-cbioportal
 
 # Copy the source and build the JAR with the example application.properties; the
 # user overrides these application.properties at runtime, injected via
@@ -66,8 +83,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3-setuptools \
         python3-pip \
         unzip \
-        perl \
-    && rm -rf /var/lib/apt/lists/*
+        perl
+RUN rm -rf /var/lib/apt/lists/*
+RUN pip3 install wheel --break-system-packages
 
 # Install the ClickHouse client, pinned to a stable LTS. Only the
 # `clickhouse client` subcommand is needed (to talk to the separate ClickHouse
@@ -95,6 +113,7 @@ RUN apt-get update \
     && pip3 install --break-system-packages --no-cache-dir -r /core/requirements.txt \
     && apt-get purge -y --auto-remove build-essential python3-dev \
     && rm -rf /var/lib/apt/lists/*
+
 
 # put config files in this folder if you want to override config
 ENV PATH="/core/scripts:/core/scripts/importer:/core/scripts/clickhouse_import_support:$PATH"

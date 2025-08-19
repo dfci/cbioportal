@@ -109,8 +109,6 @@ Dockerfile.local
 security.properties
 *.crt
 *.key
-*~
-docs/.obsidian/
-.hermes/
-docker-test-checklist.md
-command-audit.md
+*.pem
+src/main/resources/downloads/*
+!src/main/resources/downloads/.gitkeep

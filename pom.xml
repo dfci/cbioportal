@@ -12,13 +12,13 @@
 
   <groupId>io.github.cbioportal</groupId>
   <artifactId>cbioportal</artifactId>
-  <version>v7.0.1</version>
+  <version>v7.0.1-dfci</version>
   <packaging>jar</packaging>
   <description>cBioPortal for Cancer Genomics</description>
 
   <properties>
     <m2e.apt.activation>jdt_apt</m2e.apt.activation>
-    <!-- <maven.compiler.release>21</maven.compiler.release>-->
+    <maven.compiler.release>21</maven.compiler.release>
     <sonar.java.source>21</sonar.java.source>
     <java.version>21</java.version>
     <maven.compiler.source>21</maven.compiler.source>
@@ -28,7 +28,7 @@
     <!-- TODO replace with version of cbioportal frontend with compatible login url-->
     <frontend.groupId>io.github.cbioportal</frontend.groupId>
     <frontend.artifactId>frontend-cbioportal</frontend.artifactId>
-    <frontend.version>v7.0.1</frontend.version>
+    <frontend.version>0.3.0</frontend.version>
     <!-- THIS SHOULD BE KEPT IN SYNC TO VERSION IN CGDS.SQL -->
     <db.version>2.14.5</db.version>
     <derived_table.version>1.0.11</derived_table.version>
@@ -52,7 +52,7 @@
     <sonar.coverage.exclusions>**src/test/**/*.*</sonar.coverage.exclusions>
 
     <!-- JaCoCo Properties -->
-    <jacoco.version>0.8.11</jacoco.version>
+    <jacoco.version>0.8.12</jacoco.version>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <sonar.language>java</sonar.language>
@@ -93,11 +93,13 @@
     <json_simple.version>1.1.1</json_simple.version>
     <mongo_java_driver.version>3.12.14</mongo_java_driver.version>
     <datumbox.version>0.8.2</datumbox.version>
+    <dasniko-testcontainer-keycloak.version>3.2.0</dasniko-testcontainer-keycloak.version>
     <selenium_chrome_driver.version>3.14.0</selenium_chrome_driver.version>
     <selenium.version>4.31.0</selenium.version>
     <sentry.version>7.1.0</sentry.version>
     <clickhouse_testcontainer.version>1.19.7</clickhouse_testcontainer.version>
     <bouncy_castle.version>1.78</bouncy_castle.version>
+    <apache_httpclient.version>5.2.1</apache_httpclient.version>
     <mapstruct.version>1.6.3</mapstruct.version>
     <tomcat.version>10.1.45</tomcat.version>
     <velocity.version>2.4</velocity.version>
@@ -106,37 +108,18 @@
     <bundle.symbolicName.prefix>org.mskcc</bundle.symbolicName.prefix>
     <bundle.namespace>org.mskcc.mondrian</bundle.namespace>
 
-    <!-- Maven Central -->
-    <mavenCentralDeploymentName>Deployment</mavenCentralDeploymentName>
-
     <skipIntegrationTests>true</skipIntegrationTests>
     <skipE2ETests>True</skipE2ETests>
   </properties>
 
-  <!-- Maven Central Requirements -->
-  <name>${project.groupId}:${project.artifactId}</name>
-  <url>https://www.cbioportal.org</url>
-  <licenses>
-    <license>
-      <name>GNU AFFERO GENERAL PUBLIC LICENSE v3.0</name>
-      <url>https://www.gnu.org/licenses/agpl-3.0.html</url>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <name>Zain Nasir</name>
-      <email>nasirz1@mskcc.org</email>
-      <organization>Memorial Sloan Kettering Cancer Center</organization>
-      <organizationUrl>https://www.mskcc.org/</organizationUrl>
-    </developer>
-  </developers>
-  <scm>
-    <connection>scm:git:git://github.com/cBioPortal/cbioportal.git</connection>
-    <developerConnection>scm:git:ssh://github.com:cBioPortal/cbioportal.git</developerConnection>
-    <url>https://github.com/cBioPortal/cbioportal/tree/master</url>
-  </scm>
-
   <dependencies>
+    <!--BEGIN  TEST AREA -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-gateway-mvc</artifactId>
+      <version>4.1.5</version>
+    </dependency>
+    <!-- END TEST AREA -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -812,6 +795,12 @@
   </reporting>
 
   <pluginRepositories>
+    <!-- needed for the maven-external-version-plugin -->
+    <pluginRepository>
+      <id>jboss-third-party</id>
+      <url>
+        https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
+    </pluginRepository>
     <pluginRepository>
       <id>maven-snapshots</id>
       <url>https://repository.apache.org/content/repositories/snapshots/</url>
@@ -824,6 +813,16 @@
   </pluginRepositories>
 
   <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+    <!-- needed for the maven-external-version-plugin -->
+    <repository>
+      <id>jboss-third-party</id>
+      <url>
+        https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
+    </repository>
     <!-- needed for the opensaml dependency -->
     <repository>
       <id>shiboleth</id>
@@ -866,82 +865,6 @@
         <skipIntegrationTests>true</skipIntegrationTests>
         <skipE2ETests>false</skipE2ETests>
       </properties>
-    </profile>
-    <!-- Maven Central -->
-    <profile>
-      <id>maven-central</id>
-      <activation>
-        <property>
-          <name>mavenCentral</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.7.0</version>
-            <extensions>true</extensions>
-            <configuration>
-              <publishingServerId>central</publishingServerId>
-              <autoPublish>true</autoPublish>
-              <deploymentName>${mavenCentralDeploymentName}</deploymentName>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>3.3.0</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.1.0</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <gpgArguments>
-                <arg>--pinentry-mode</arg>
-                <arg>loopback</arg>
-              </gpgArguments>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.6.3</version>
-            <executions>
-              <execution>
-                <id>attach-javadoc</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <stylesheet>java</stylesheet>
-              <doclint>none</doclint>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 

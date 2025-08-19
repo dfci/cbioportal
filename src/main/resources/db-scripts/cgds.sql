@@ -742,6 +742,33 @@ CREATE TABLE `resource_study` (
   FOREIGN KEY (`INTERNAL_ID`) REFERENCES `cancer_study` (`CANCER_STUDY_ID`) ON DELETE CASCADE
 );
 
+
+CREATE TABLE `import_study` (
+  `STUDY_ID` varchar(255),
+  `STUDY_PATH` varchar(1024),
+  `NAME` varchar(255),
+  `IMPORTED` boolean,
+  `VALIDATED` boolean,
+  `IMPORT_DATE` datetime,
+  `VALIDATION_DATE` datetime,
+  `IMPORT_RUNNING` boolean,
+  `VALIDATION_RUNNING` boolean,
+  PRIMARY KEY (`STUDY_ID`)
+);
+
+CREATE TABLE `import_log` (
+    `ID` int(10)  NOT NULL auto_increment,
+    `TEXT` mediumtext,
+    `RAW_TEXT` mediumtext,
+    `IS_TEST_RUN` boolean,
+    `LOG_TYPE` varchar(10),
+    `STUDY_ID` varchar(255),
+    `START_DATE` datetime,
+    `REQUESTER` varchar(128),
+    `PASSED` varchar(10) default "pending",
+    PRIMARY KEY (`ID`)
+);
+
 -- DB_SCHEMA_VERSION AND DERIVED_TABLE_SCHEMA_VERSION MUST BE KEPT IN SYNC WITH THE db.version AND derived_table.version PROPERTIES IN pom.xml
 INSERT INTO `info` (`DB_SCHEMA_VERSION`, `GENESET_VERSION`, `DERIVED_TABLE_SCHEMA_VERSION`, `GENE_TABLE_VERSION`)
   VALUES ('2.14.5', NULL, '1.0.11', NULL);

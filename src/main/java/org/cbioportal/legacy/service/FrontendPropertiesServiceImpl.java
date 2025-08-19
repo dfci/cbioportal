@@ -120,6 +120,7 @@ public class FrontendPropertiesServiceImpl implements FrontendPropertiesService 
     skin_show_data_tab("skin.show_data_tab", null),
     skin_show_faqs_tab("skin.show_faqs_tab", null),
     skin_show_news_tab("skin.show_news_tab", null),
+    skin_show_profile_download_tab("skin.show_profile_download_tab", null),
     skin_show_r_matlab_tab("skin.show_r_matlab_tab", null),
     skin_show_tools_tab("skin.show_tools_tab", null),
     skin_show_tutorials_tab("skin.show_tutorials_tab", null),
