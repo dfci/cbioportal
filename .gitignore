@@ -117,3 +117,6 @@ command-audit.md
 
 # Local MCP server config (may hold credentials)
 .mcp.json
+*.pem
+src/main/resources/downloads/*
+!src/main/resources/downloads/.gitkeep

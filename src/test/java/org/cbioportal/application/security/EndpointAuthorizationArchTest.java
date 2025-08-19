@@ -80,12 +80,15 @@ public class EndpointAuthorizationArchTest {
           "org.cbioportal.legacy.web.SessionServiceController",
 
           // External service proxies (no study data)
-          "org.cbioportal.application.proxy.ProxyController",
-          "org.cbioportal.application.proxy.LegacyProxyController",
+          "org.cbioportal.application.proxy.ProxyExchangeGateway",
+          "org.cbioportal.application.proxy.APIProxyController",
           "org.cbioportal.legacy.web.MatchMinerController",
 
           // URL shortener (utility, no study data)
           "org.cbioportal.legacy.url_shortener.URLShortenerController",
+
+          // Forwards to the DFCI importer service, which checks the requester's study authority
+          "org.cbioportal.legacy.web.ImportController",
 
           // TODO: These controllers access study-specific data and SHOULD have @PreAuthorize.
           // They are listed here temporarily to avoid breaking the build.

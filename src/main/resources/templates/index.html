@@ -12,9 +12,11 @@
 
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
  
-    <link rel="icon" href="/images/cbioportal_icon.png"/>
+    <link rel="icon" href="./images/cbioportal_icon.png"/>
     <title>cBioPortal for Cancer Genomics</title>
-    
+    <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css" rel="stylesheet" />
     <script>
         
         var postData = [(${postData})];
@@ -72,10 +74,8 @@
         loadAppStyles(window.frontendConfig);
     </script>
     
-    <div th:replace="~{tracking_include}" />
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
-
+	
 </head>
 
 <body>

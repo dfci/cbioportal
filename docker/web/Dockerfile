@@ -11,6 +11,19 @@
 # Use from root directory of repo like:
 #
 # docker build -f docker/web/Dockerfile -t cbioportal-container:web-shenandoah-tag-name .
+ARG FRONTEND_BRANCH=v.7.0.1-dfci
+
+# Build the DFCI-customized frontend from source instead of pulling a prebuilt
+# jar from JitPack: JitPack's build environment lags behind (stale JDK/glibc),
+# so on-demand builds of recent frontend commits fail there. Building here uses
+# our own (current) maven image instead, sidestepping that entirely.
+FROM maven:3-eclipse-temurin-21 AS build-frontend
+ARG FRONTEND_BRANCH
+# This invalidates the Docker cache iff the latest commit hash for FRONTEND_BRANCH has changed
+ADD https://api.github.com/repos/dfci/cbioportal-frontend/commits/${FRONTEND_BRANCH} /dev/null
+RUN git clone --branch ${FRONTEND_BRANCH} --depth 1 https://github.com/dfci/cbioportal-frontend.git /cbioportal-frontend \
+    && mvn -f /cbioportal-frontend/pom.xml -q clean install -DskipTests -Dgpg.skip=true
+
 FROM maven:3-eclipse-temurin-21 AS build
 
 WORKDIR /cbioportal
@@ -19,6 +32,11 @@ WORKDIR /cbioportal
 # version.sh, so that changing application source does not re-download them.
 COPY pom.xml version.sh ./
 RUN mvn -q dependency:go-offline --fail-never
+
+# Make the freshly-built frontend-cbioportal jar available in this stage's
+# local repo so the dependency-plugin `unpack` (bound to prepare-package,
+# during `mvn package` below) can resolve it without reaching out to JitPack.
+COPY --from=build-frontend /root/.m2/repository/io/github/cbioportal/frontend-cbioportal /root/.m2/repository/io/github/cbioportal/frontend-cbioportal
 
 # Build the executable boot jar (`package`; no `install`/`clean` needed in a
 # fresh build stage). The example application.properties is put in place first so
