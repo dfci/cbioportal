@@ -100,7 +100,7 @@ public class ProxyExchangeGateway {
 
     HttpHeaders newHeaders = new HttpHeaders();
     for (String httpHeader : response.getHeaders().keySet()) {
-      if (httpHeader.equals("Transfer-Encoding")) {
+      if (httpHeader.equalsIgnoreCase("Transfer-Encoding")) {
         continue;
       }
       newHeaders.put(httpHeader, response.getHeaders().get(httpHeader));
