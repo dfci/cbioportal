@@ -11,8 +11,12 @@
 # NOTE: the .git folder is included in the build stage (the git-commit-id Maven
 # plugin needs it), but excluded from the final image. No confidential
 # information is exposed. (see: stackoverflow.com/questions/56278325)
-ARG CORE_BRANCH=main
 ARG FRONTEND_BRANCH=v.7.0.1-dfci
+
+# Source for the `clickhouse` client binary below, pinned to the same tag as
+# the cbioportal-database service in cbioportal-devops/docker-compose.yml so
+# client and server versions always match.
+FROM clickhouse/clickhouse-server:24.10 AS clickhouse
 
 # Build the DFCI-customized frontend from source instead of pulling a prebuilt
 # jar from JitPack: JitPack's build environment lags behind (stale JDK/glibc),
@@ -59,14 +63,21 @@ RUN cp src/main/resources/application.properties.EXAMPLE src/main/resources/appl
     && (cd target/dependency && jar -xf ../*-exec.jar)
 
 FROM maven:3-eclipse-temurin-21 AS build-core
-ARG CORE_BRANCH
-# This invalidates the Docker cache iff the latest commit hash for the CORE_BRANCH has changed
-ADD https://api.github.com/repos/cBioPortal/cbioportal-core/commits/${CORE_BRANCH} /dev/null
+# Pinned to a specific commit (not a branch) so cbioportal and
+# cbioportal-importer build against the exact same cbioportal-core version.
+# No tagged release currently supports ClickHouse (the last cut release,
+# v1.0.16, still uses uppercase MySQL-era column names), so a commit SHA is
+# pinned directly instead of a release/branch name.
+ARG CORE_BRANCH=c3c8edfa366dea7b150d36af08b06f770e333789
 # We touch application.properties here just to get cbioportal-core building
 # Later we will inject the user-provided application.properties using 'jar uf ..', see the cbioportal-docker-compose repo
-RUN git clone --branch ${CORE_BRANCH} --depth 1 https://github.com/cBioPortal/cbioportal-core.git /cbioportal-core \
-    && touch /cbioportal-core/src/main/resources/application.properties \
-    && mvn -f /cbioportal-core/pom.xml clean install -DskipTests \
+RUN git init -q /cbioportal-core \
+    && cd /cbioportal-core \
+    && git remote add origin https://github.com/cBioPortal/cbioportal-core.git \
+    && git fetch --depth 1 origin ${CORE_BRANCH} \
+    && git checkout -q FETCH_HEAD \
+    && touch src/main/resources/application.properties \
+    && mvn -f pom.xml clean install -DskipTests \
     && mkdir -p /core && cd /core && cp /cbioportal-core/core-*.jar . && jar -xf core-*.jar scripts/ requirements.txt
 
 # JRE (not JDK) runtime: the final image only runs prebuilt jars, so the JDK's
@@ -87,16 +98,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN rm -rf /var/lib/apt/lists/*
 RUN pip3 install wheel --break-system-packages
 
-# Install the ClickHouse client, pinned to a stable LTS. Only the
-# `clickhouse client` subcommand is needed (to talk to the separate ClickHouse
-# server during data import); no server or clickhouse-local runs in this image.
-# The pinned static binary keeps the build reproducible and works on amd64/arm64.
-ARG CLICKHOUSE_VERSION=25.8.24.21
-RUN ARCH="$(dpkg --print-architecture)" \
-    && curl -fsSL "https://packages.clickhouse.com/tgz/lts/clickhouse-common-static-${CLICKHOUSE_VERSION}-${ARCH}.tgz" -o /tmp/clickhouse.tgz \
-    && tar -xzf /tmp/clickhouse.tgz -C /tmp \
-    && install -m 755 "/tmp/clickhouse-common-static-${CLICKHOUSE_VERSION}/usr/bin/clickhouse" /usr/bin/clickhouse \
-    && rm -rf /tmp/clickhouse.tgz "/tmp/clickhouse-common-static-${CLICKHOUSE_VERSION}"
+# Install the ClickHouse client. Only the `clickhouse client` subcommand is
+# needed (to talk to the separate ClickHouse server during data import); no
+# server or clickhouse-local runs in this image.
+COPY --from=clickhouse /usr/bin/clickhouse /usr/bin/clickhouse
 
 # copy over core files (scripts, requirements) built from cbioportal-core
 COPY --from=build-core /core/scripts /core/scripts
