@@ -11,7 +11,7 @@
 # Use from root directory of repo like:
 #
 # docker build -f docker/web/Dockerfile -t cbioportal-container:web-shenandoah-tag-name .
-ARG FRONTEND_BRANCH=v.7.0.1-dfci
+ARG FRONTEND_BRANCH=v7.1.3-SNAPSHOT-dfci
 
 # Build the DFCI-customized frontend from source instead of pulling a prebuilt
 # jar from JitPack: JitPack's build environment lags behind (stale JDK/glibc),
