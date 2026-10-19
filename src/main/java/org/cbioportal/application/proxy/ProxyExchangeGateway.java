@@ -100,7 +100,12 @@ public class ProxyExchangeGateway {
 
     HttpHeaders newHeaders = new HttpHeaders();
     for (String httpHeader : response.getHeaders().keySet()) {
-      if (httpHeader.equalsIgnoreCase("Transfer-Encoding")) {
+      // RestTemplate's HTTP client already decompressed the body without stripping
+      // Content-Encoding, so these hop-by-hop/transport headers no longer match it.
+      if (httpHeader.equalsIgnoreCase("Transfer-Encoding")
+          || httpHeader.equalsIgnoreCase("Content-Encoding")
+          || httpHeader.equalsIgnoreCase("Content-Length")
+          || httpHeader.equalsIgnoreCase("Connection")) {
         continue;
       }
       newHeaders.put(httpHeader, response.getHeaders().get(httpHeader));
