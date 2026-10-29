@@ -11,7 +11,7 @@
 # NOTE: the .git folder is included in the build stage (the git-commit-id Maven
 # plugin needs it), but excluded from the final image. No confidential
 # information is exposed. (see: stackoverflow.com/questions/56278325)
-ARG FRONTEND_BRANCH=v7.1.3-dfci
+ARG FRONTEND_BRANCH=v7.1.3-dfci-unlisted-unavailable-study
 
 # Source for the `clickhouse` client binary below, pinned to the same tag as
 # the cbioportal-database service in cbioportal-devops/docker-compose.yml so
