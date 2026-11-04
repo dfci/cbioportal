@@ -837,6 +837,12 @@
   </pluginRepositories>
 
   <repositories>
+    <!-- Put maven-central first to speed up Docker builds -->
+    <!-- needed for keycloak test containers -->
+    <repository>
+      <id>maven-central</id>
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
     <repository>
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
@@ -851,11 +857,6 @@
     <repository>
       <id>shiboleth</id>
       <url>https://build.shibboleth.net/maven/releases/</url>
-    </repository>
-    <!-- needed for keycloak test containers -->
-    <repository>
-      <id>maven-central</id>
-      <url>https://repo1.maven.org/maven2/</url>
     </repository>
   </repositories>
 
