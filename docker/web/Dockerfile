@@ -31,7 +31,8 @@ WORKDIR /cbioportal
 # Resolve Maven dependencies first, in their own layer keyed only on pom.xml +
 # version.sh, so that changing application source does not re-download them.
 COPY pom.xml version.sh ./
-RUN mvn -q dependency:go-offline --fail-never
+ARG MAVEN_DEP_OPTS=--fail-never
+RUN mvn ${MAVEN_DEP_OPTS} dependency:go-offline
 
 # Make the freshly-built frontend-cbioportal jar available in this stage's
 # local repo so the dependency-plugin `unpack` (bound to prepare-package,
@@ -45,7 +46,7 @@ COPY --from=build-frontend /root/.m2/repository/io/github/cbioportal/frontend-cb
 ARG MAVEN_OPTS=-DskipTests
 COPY . .
 RUN cp src/main/resources/application.properties.EXAMPLE src/main/resources/application.properties \
-    && mvn ${MAVEN_OPTS} -q package
+    && mvn ${MAVEN_OPTS} package
 
 # JRE (not JDK) runtime: this image only runs the prebuilt jar, so the JDK's
 # compiler/dev tooling is not needed. Shenandoah GC is included in the standard
