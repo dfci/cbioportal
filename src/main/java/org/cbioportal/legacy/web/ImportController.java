@@ -15,6 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.cbioportal.application.rest.availability.SearchKeyword;
 import org.cbioportal.legacy.model.User;
 import org.cbioportal.legacy.model.importer.ImportLog;
 import org.cbioportal.legacy.model.importer.ImportStudy;
@@ -51,7 +52,7 @@ public class ImportController {
       content = @Content(schema = @Schema(implementation = ImportLog.class)))
   public ResponseEntity<ImportLog> getLog(
       @PathVariable("logType") String logType,
-      @PathVariable("studyId") String studyId,
+      @SearchKeyword @PathVariable("studyId") String studyId,
       @PathVariable("id") String id,
       Authentication authentication) {
     HttpGet request = new HttpGet("http://importer:8080/log/" + studyId + "/" + id);
@@ -81,7 +82,7 @@ public class ImportController {
       content = @Content(array = @ArraySchema(schema = @Schema(implementation = ImportLog.class))))
   public ResponseEntity<List<ImportLog>> getAllLogsForStudy(
       @PathVariable("logType") String logType,
-      @PathVariable("studyId") String studyId,
+      @SearchKeyword @PathVariable("studyId") String studyId,
       Authentication authentication) {
     HttpGet request = new HttpGet("http://importer:8080/logs/" + studyId + "/" + logType);
     setUserIdHeader(authentication, request);
@@ -138,7 +139,7 @@ public class ImportController {
       description = "OK",
       content = @Content(schema = @Schema(implementation = ImportStudy.class)))
   public ResponseEntity<ImportStudy> getImporterStudy(
-      @PathVariable("studyId") String studyId, Authentication authentication) {
+      @SearchKeyword @PathVariable("studyId") String studyId, Authentication authentication) {
     HttpGet request = new HttpGet("http://importer:8080/studies/" + studyId);
     setUserIdHeader(authentication, request);
 
@@ -165,7 +166,7 @@ public class ImportController {
       description = "OK",
       content = @Content(schema = @Schema(implementation = String.class)))
   public ResponseEntity<String> runTrialImport(
-      @PathVariable("studyId") String studyId, Authentication authentication)
+      @SearchKeyword @PathVariable("studyId") String studyId, Authentication authentication)
       throws IOException, InterruptedException {
     String username = getUserName(authentication);
     HttpGet request =
@@ -191,7 +192,7 @@ public class ImportController {
       description = "OK",
       content = @Content(schema = @Schema(implementation = String.class)))
   public ResponseEntity<String> runTrialValidation(
-      @PathVariable("studyId") String studyId, Authentication authentication)
+      @SearchKeyword @PathVariable("studyId") String studyId, Authentication authentication)
       throws IOException, InterruptedException {
     String username = getUserName(authentication);
     HttpGet request =
