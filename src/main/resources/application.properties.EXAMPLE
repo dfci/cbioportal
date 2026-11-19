@@ -23,6 +23,12 @@ db.suppress_schema_version_mismatch_errors=false
 # Enable compression on responses
 server.compression.enabled=true
 
+# Actuator / Prometheus metrics, off by default. To enable, set a port (e.g. 8081) and scrape
+# /actuator/prometheus on it; that port will bypass portal login.
+management.server.port=-1
+management.endpoints.web.exposure.include=health,prometheus
+management.metrics.tags.application=cbioportal
+
 # set tomcat_resource_name when using dbconnector=jndi instead of the default
 # dbconnector=dbcp. Note that dbconnector needs to be set in CATLINA_OPTS when
 # using Tomcat (CATALINA_OPTS="-Ddbconnector=jndi"). It does not get picked up

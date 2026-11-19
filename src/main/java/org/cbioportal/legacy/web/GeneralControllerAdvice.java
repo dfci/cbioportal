@@ -30,9 +30,12 @@ public class GeneralControllerAdvice implements ResponseBodyAdvice<Object> {
 
     // report the procesing time of all api endpoints to aid in benchmarking as we transition
     // to clickhouse
-    long startTime = (long) servletServerRequest.getServletRequest().getAttribute("startTime");
-    long timeElapsed = System.currentTimeMillis() - startTime;
-    response.getHeaders().add("Elapsed-Time", String.valueOf(timeElapsed));
+    Object startTime = servletServerRequest.getServletRequest().getAttribute("startTime");
+    // startTime is absent on the actuator management port, which skips ExecuterTimeInterceptor
+    if (startTime instanceof Long start) {
+      long timeElapsed = System.currentTimeMillis() - start;
+      response.getHeaders().add("Elapsed-Time", String.valueOf(timeElapsed));
+    }
     return body;
   }
 }
